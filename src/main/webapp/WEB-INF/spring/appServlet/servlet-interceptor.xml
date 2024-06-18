@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- interceptor 설정 -->
+	<beans:bean id="level0Interceptor" class="com.spring.sInterceptor2.interceptor.Level0Interceptor"></beans:bean>
+	<beans:bean id="level3Interceptor" class="com.spring.sInterceptor2.interceptor.Level3Interceptor"></beans:bean>
+	<beans:bean id="level2Interceptor" class="com.spring.sInterceptor2.interceptor.Level2Interceptor"></beans:bean>
+	<beans:bean id="level99Interceptor" class="com.spring.sInterceptor2.interceptor.Level99Interceptor"></beans:bean>
+
+	<!-- 가장 관대한 걸 위에, 가장 폐쇄적인 것을 아래에 둔다. -->
+	<interceptors>
+		<!-- 비회원 -->
+		<interceptor>
+			<!-- 영향 받는 것부터 mapping path 설정한 후에 예외(제외)처리 -->
+			<mapping path="/**" />
+			<exclude-mapping path="/" />
+			<exclude-mapping path="/h" />
+			<exclude-mapping path="/member/login" />
+			<exclude-mapping path="/member/logout" />
+			<!--
+			<exclude-mapping path="/message/logout" />
+			<exclude-mapping path="/message/loginNo" />
+			-->
+			<exclude-mapping path="/member/join" />
+			<exclude-mapping path="/member/idCheck" />
+			<exclude-mapping path="/member/nickCheck" />
+			<exclude-mapping path="/guest/guestList" />
+			<beans:ref bean="level99Interceptor" />
+		</interceptor>
+		<!-- 준회원 -->
+		<interceptor>
+			<mapping path="/board/**" />
+			<mapping path="/pds/**" />
+			<exclude-mapping path="/board/boardList" />
+			<beans:ref bean="level3Interceptor" />
+		</interceptor>
+		<!-- 정회원 -->
+		<interceptor>
+			<mapping path="/pds/**" />
+			<exclude-mapping path="/pds/pdsList" />
+			<exclude-mapping path="/pds/pdsDownload" />
+			<beans:ref bean="level2Interceptor" />
+		</interceptor>
+		<!-- 관리자 -->
+		<interceptor>
+			<mapping path="/admin/**" />
+			<beans:ref bean="level0Interceptor" />
+		</interceptor>
+	</interceptors>
+</beans:beans>
